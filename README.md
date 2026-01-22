@@ -3,11 +3,6 @@
 ![R Version](https://img.shields.io/badge/R-4.3.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
-![Analytics](https://img.shields.io/badge/domain-healthcare%20analytics-orange.svg)
-![GitHub stars](https://img.shields.io/github/stars/ahmadsyamsulrizal/orthotics-prosthetics-analytics?style=social)
-![GitHub forks](https://img.shields.io/github/forks/ahmadsyamsulrizal/orthotics-prosthetics-analytics?style=social)
-![GitHub issues](https://img.shields.io/github/issues/ahmadsyamsulrizal/orthotics-prosthetics-analytics)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ahmadsyamsulrizal/orthotics-prosthetics-analytics)
 
 ## 📌 Overview
 This project reflects a strong background in healthcare analytics, machine learning, and deep learning.  
