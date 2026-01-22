@@ -1,0 +1,51 @@
+---
+title: "Deep Learning Experiments: Orthotics-Prosthetics Analytics"
+author: "Ahmad Syamsul Rizal"
+date: "2026-01-22"
+output: html_document
+---
+
+```{r setup, include=TRUE, error=TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(caret)
+library(nnet)
+
+# Load & Preprocess Dataset
+dataset <- read.csv("C:/Users/user/Downloads/Data analyst/orthotic-prosthetic-analytics/data/cleaned/prosthetics-orthotics-datasets_cleaned.csv", stringsAsFactors = TRUE)
+dataset$Clinician_Notes <- factor(dataset$Clinician_Notes)
+
+# Filter Rare Categories (< 5 Observations)
+note_freq <- table(dataset$Clinician_Notes)
+rare_levels <- names(note_freq[note_freq < 5])
+dataset <- subset(dataset, !(Clinician_Notes %in% rare_levels))
+dataset$Clinician_Notes <- droplevels(dataset$Clinician_Notes)
+
+# Pastikan kolom target ada
+stopifnot("Clinician_Notes" %in% colnames(dataset))
+
+# Encode Features & Labels
+x <- dataset[, c("Mobility_Score", "Pain_Score", "Satisfaction_Score")]
+y <- factor(dataset$Clinician_Notes)
+
+# Split train/test
+set.seed(123)
+trainIndex <- createDataPartition(y, p = 0.8, list = FALSE)
+trainX <- x[trainIndex, ]
+trainY <- y[trainIndex]
+testX  <- x[-trainIndex, ]
+testY  <- y[-trainIndex]
+
+# Build Neural Network
+nn_model <- nnet(trainX, class.ind(trainY),
+                 size = 10,   # hidden units
+                 maxit = 200, # epochs
+                 softmax = TRUE)
+
+summary(nn_model)
+
+# Prediction
+pred <- predict(nn_model, testX, type = "class")
+
+# Confusion Matrix
+confusionMatrix(factor(pred), testY)

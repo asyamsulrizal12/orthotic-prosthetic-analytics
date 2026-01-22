@@ -1,0 +1,78 @@
+---
+title: "Exploratory Data Analysis: Orthotics-Prosthetics Analytics"
+author: "Ahmad Syamsul Rizal"
+date: "2026-01-22"
+output: html_document
+---
+
+```{r setup, include=TRUE, error=TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(caret)
+library(ggplot2)
+library(GGally)
+library(forcats)
+
+dataset <- read.csv("C:/Users/user/Downloads/Data analyst/orthotic-prosthetic-analytics/data/cleaned/prosthetics-orthotics-datasets_cleaned.csv", stringsAsFactors = TRUE)
+
+# Quick Check
+str(dataset)
+summary(dataset)
+
+# Count Frequency of Each Category
+freq <- table(dataset$Clinician_Notes)
+
+# Determine Rare Categories (< 5 Observations)
+rare_levels <- names(freq[freq < 5])
+
+# Merge Rare Categories as “Other”
+dataset$Clinician_Notes <- fct_other(dataset$Clinician_Notes,
+                                     keep = setdiff(levels(dataset$Clinician_Notes), rare_levels))
+
+# Drop Level to Clear Empty Levels
+dataset$Clinician_Notes <- droplevels(dataset$Clinician_Notes)
+
+# Check the Level Count After Merging
+levels(dataset$Clinician_Notes)
+
+# Target Variable Distribution
+ggplot(dataset, aes(x = Clinician_Notes)) +
+  geom_bar(fill = "steelblue") +
+  theme_minimal() +
+  labs(title = "Distribution of Clinician Notes", x = "Notes", y = "Count")
+  
+# Numeric Variable Summary
+dataset %>% select(Mobility_Score, Pain_Score, Satisfaction_Score) %>% summary()
+dataset %>% 
+  pivot_longer(cols = c(Mobility_Score, Pain_Score, Satisfaction_Score),
+               names_to = "Variable", values_to = "Value") %>%
+  ggplot(aes(x = Value, fill = Variable)) +
+  geom_histogram(bins = 20, alpha = 0.7) +
+  facet_wrap(~Variable, scales = "free") +
+  theme_minimal() +
+  labs(title = "Distribution of Numeric Variables")
+  
+# Correlation Analysis
+cor_matrix <- cor(dataset %>% select(Mobility_Score, Pain_Score, Satisfaction_Score))
+cor_matrix
+
+# Pair Plot Numeric Only + Clinician Notes (Categories Combined)
+ggpairs(dataset %>% select(Mobility_Score, Pain_Score, Satisfaction_Score, Clinician_Notes),
+        aes(color = Clinician_Notes),
+        cardinality_threshold = 30)
+        
+# Boxplots by Clinician Notes
+ggplot(dataset, aes(x = Clinician_Notes, y = Mobility_Score, fill = Clinician_Notes)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Mobility Score by Clinician Notes")
+
+ggplot(dataset, aes(x = Clinician_Notes, y = Pain_Score, fill = Clinician_Notes)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Pain Score by Clinician Notes")
+
+ggplot(dataset, aes(x = Clinician_Notes, y = Satisfaction_Score, fill = Clinician_Notes)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Satisfaction Score by Clinician Notes")
